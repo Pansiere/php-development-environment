@@ -1,144 +1,118 @@
-# Projeto de Conexão PHP com Banco de Dados MySQL
+# PHP Study Project
 
-Este projeto demonstra como criar uma conexão entre uma aplicação PHP e um banco de dados MySQL. Isso é útil para construir aplicações web dinâmicas que precisam armazenar e recuperar informações de um banco de dados relacional.
+Este projeto foi criado para estudo de PHP utilizando contêineres Docker. O projeto utiliza `phpdocker-io` para gerar os contêineres PHP-FPM, MySQL e Nginx. Além disso, foi adicionado um contêiner para o PhpMyAdmin.
 
-## Configuração do Ambiente
+## Pré-requisitos
 
-Antes de começar, certifique-se de ter o seguinte configurado no seu ambiente de desenvolvimento:
+- Docker e Docker Compose instalados no sistema.
+- As portas 80 e 8080 devem estar livres para que os contêineres funcionem corretamente.
 
-- **Servidor Web:** Apache, Nginx, ou outro servidor web configurado e rodando.
-- **PHP:** Versão 7.x ou superior instalada. Recomenda-se utilizar PHP 8 para aproveitar os recursos mais recentes.
-- **MySQL:** Servidor MySQL instalado e configurado localmente ou remotamente.
+## Serviços
 
-## Criação do Banco de Dados e Atribuição de Permissões
+Este projeto utiliza os seguintes serviços:
 
-### Criação do Banco de Dados
+- **MySQL**: Banco de dados MySQL 8.0.
+- **Nginx**: Servidor web Nginx.
+- **PHP-FPM**: Process Manager FastCGI para PHP.
+- **PhpMyAdmin**: Ferramenta de administração MySQL através de uma interface web.
 
-Antes de começar a usar o PHP para interagir com o MySQL, é necessário criar um banco de dados e uma tabela para seu projeto. Você pode fazer isso usando o cliente MySQL ou outra ferramenta de administração de banco de dados.
+## Configuração
 
-Exemplo de criação de um banco de dados `meu_banco_de_dados`:
+O arquivo `docker-compose.yml` utilizado no projeto é o seguinte:
 
-```SQL
-CREATE DATABASE meu_banco_de_dados;
+```yaml
+###############################################################################
+#                          Generated on phpdocker.io                          #
+#                                    &                                        #
+#                    Modificado por João Pedro V. Pansiere                    #
+###############################################################################
+version: "3.1"
+services:
+  mysql:
+    image: "mysql:8.0"
+    container_name: mysql
+    working_dir: /application
+    volumes:
+      - ".:/application"
+      - "./.mysql-data/db:/var/lib/mysql"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=DB
+      - MYSQL_USER=php
+      - MYSQL_PASSWORD=password
+
+  webserver:
+    image: "nginx:alpine"
+    container_name: nginx
+    working_dir: /application
+    volumes:
+      - ".:/application"
+      - "./phpdocker.io/nginx/nginx.conf:/etc/nginx/conf.d/default.conf"
+    ports:
+      - "80:80"
+
+  php-fpm:
+    build: phpdocker.io/php-fpm
+    container_name: php
+    working_dir: /application
+    volumes:
+      - ".:/application"
+      - "./phpdocker.io/php-fpm/php-ini-overrides.ini:/etc/php/8.3/fpm/conf.d/99-overrides.ini"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin
+    restart: always
+    environment:
+      - PMA_HOST=mysql
+      - PMA_USER=root
+      - PMA_PASSWORD=password
+    ports:
+      - "8080:80"
 ```
 
-### Atribuição de Permissões
+## Instruções de Uso
 
-Após criar o banco de dados, você precisa atribuir permissões adequadas para o usuário do MySQL que será usado pela aplicação PHP. É uma boa prática conceder apenas as permissões necessárias para minimizar potenciais vulnerabilidades.
+1. Clone este repositório:
 
-Exemplo de atribuição de permissões:
+   ```sh
+   git clone https://github.com/Pansiere/php-development-environment.git
+   cd php-development-environment
+   ```
 
-```SQL
-GRANT SELECT, INSERT, UPDATE, DELETE ON seu_banco_de_dados.* TO 'seu_usuario_php'@'localhost';
+2. Inicie os contêineres com Docker Compose:
+
+   ```sh
+   docker-compose up -d
+   ```
+
+3. Acesse o projeto no seu navegador:
+   - Aplicação PHP: `http://localhost`
+   - PhpMyAdmin: `http://localhost:8080`
+
+## Estrutura de Diretórios
+
+A estrutura básica dos arquivos do projeto é a seguinte:
+
+```BASH
+/
+├── .mysql-data/
+├── phpdocker.io/
+│   ├── nginx/
+│   │   └── nginx.conf
+│   └── php-fpm/
+│       ├── Dockerfile
+│       └── php-ini-overrides.ini
+├── public/
+│   └── (seus arquivos PHP)
+├── docker-compose.yml
+└── README.md
 ```
 
-## 1. Uso de Parâmetros Seguros
+## Considerações
 
-Utilize parâmetros seguros para consultas SQL para prevenir ataques de injeção de SQL. Isso pode ser feito usando prepared statements ou consultas parametrizadas com PDO ou MySQLi.
+Certifique-se de que as portas 80 e 8080 estejam livres antes de iniciar os contêineres. Caso contrário, você pode alterar as portas mapeadas no arquivo `docker-compose.yml`.
 
-Exemplo usando PDO:
+---
 
-```PHP
-$sql = "SELECT * FROM usuarios WHERE username = :username";
-$stmt = $pdo->prepare($sql);
-$stmt->bindParam(':username', $username);
-$stmt->execute();
-```
-
-Exemplo usando MySQLi:
-
-```PHP
-$sql = "SELECT * FROM usuarios WHERE username = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param('s', $username);
-$stmt->execute();
-```
-
-## 2. Encerramento de Conexões Adequadamente
-
-Sempre encerre as conexões com o banco de dados quando não forem mais necessárias para liberar recursos.
-
-Exemplo com MySQLi:
-
-```PHP
-$conn->close();
-```
-
-Exemplo com PDO:
-
-```PHP
-$pdo = null; // ou use $pdo->close() se disponível
-```
-
-## 3. Validação de Dados de Entrada
-
-Valide e sanitize dados de entrada para prevenir XSS (Cross-Site Scripting) e outros tipos de ataques. Considere usar funções como filter_var() e htmlspecialchars() para sanitização e validação.
-
-Exemplo de validação básica:
-
-```PHP
-$username = filter_var($\_POST['username'], FILTER_SANITIZE_STRING);
-```
-
-## 4. Gerenciamento de Erros
-
-Implemente um bom gerenciamento de erros para capturar e tratar exceções e erros adequadamente. Isso ajuda a identificar problemas rapidamente e melhorar a segurança e estabilidade da aplicação.
-
-Exemplo com PDO:
-
-```PHP
-try {
-// código de conexão e consulta
-} catch (PDOException $e) {
-echo "Erro: " . $e->getMessage();
-// ou log do erro, redirecionamento, etc.
-}
-```
-
-## 5. Configuração Segura de Credenciais
-
-Evite armazenar credenciais de banco de dados diretamente no código fonte. Use variáveis de ambiente ou arquivos de configuração externos protegidos que não são versionados pelo controle de versão.
-
-Exemplo usando variáveis de ambiente:
-
-```PHP
-$servername = getenv('DB_SERVER');
-$username = getenv('DB_USER');
-$password = getenv('DB_PASS');
-$dbname = getenv('DB_NAME');
-```
-
-## 6. Utilização de Transações
-
-Use transações para agrupar operações de banco de dados relacionadas e garantir a integridade dos dados. Isso é especialmente útil em operações que envolvem várias consultas ou atualizações.
-
-Exemplo com PDO:
-
-```PHP
-try {
-$pdo->beginTransaction();
-// operações de banco de dados
-$pdo->commit();
-} catch (PDOException $e) {
-$pdo->rollBack();
-echo "Erro na transação: " . $e->getMessage();
-}
-```
-
-## 7. Minimização de Privilégios
-
-Conceda apenas as permissões necessárias para os usuários de banco de dados usados pela aplicação PHP. Evite conceder privilégios de administração a menos que seja absolutamente necessário. 8. Atualizações e Patches
-
-## 8. Atualizações e Patches
-
-Mantenha seu ambiente de desenvolvimento e produção atualizado com as últimas versões do PHP, MySQL e quaisquer bibliotecas ou frameworks utilizados. Isso ajuda a garantir que você tenha as últimas correções de segurança e melhorias de desempenho. 9. Auditoria e Monitoramento
-
-## 9. Auditoria e Monitoramento
-
-Implemente mecanismos de auditoria e monitoramento para detectar atividades incomuns ou suspeitas em seu aplicativo, especialmente em interações com o banco de dados. 10. Revisão de Código
-
-## 10. Revisão de Código
-
-Realize revisões de código regulares para identificar e corrigir potenciais vulnerabilidades de segurança ou práticas inadequadas de programação.
-
-Implementando essas boas práticas, você pode melhorar a segurança, desempenho e confiabilidade de aplicações PHP que interagem com bancos de dados MySQL.
+Sinta-se à vontade para ajustar o conteúdo conforme necessário para refletir com precisão o seu projeto e suas necessidades específicas.
