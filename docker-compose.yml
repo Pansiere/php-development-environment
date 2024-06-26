@@ -1,0 +1,48 @@
+###############################################################################
+#                          Generated on phpdocker.io                          #
+#                                    &                                        #
+#                    Modificado por João Pedro V. Pansiere                    #
+###############################################################################
+version: "3.1"
+services:
+  mysql:
+    image: "mysql:8.0"
+    container_name: mysql
+    working_dir: /application
+    volumes:
+      - ".:/application"
+      - "./.mysql-data/db:/var/lib/mysql"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=DB
+      - MYSQL_USER=php
+      - MYSQL_PASSWORD=password
+
+  webserver:
+    image: "nginx:alpine"
+    container_name: nginx
+    working_dir: /application
+    volumes:
+      - ".:/application"
+      - "./phpdocker.io/nginx/nginx.conf:/etc/nginx/conf.d/default.conf"
+    ports:
+      - "80:80"
+
+  php-fpm:
+    build: phpdocker.io/php-fpm
+    container_name: php
+    working_dir: /application
+    volumes:
+      - ".:/application"
+      - "./phpdocker.io/php-fpm/php-ini-overrides.ini:/etc/php/8.3/fpm/conf.d/99-overrides.ini"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin
+    restart: always
+    environment:
+      - PMA_HOST=mysql
+      - PMA_USER=root
+      - PMA_PASSWORD=password
+    ports:
+      - "8080:80"
