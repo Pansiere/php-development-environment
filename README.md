@@ -83,7 +83,7 @@ services:
 2. Inicie os contêineres com Docker Compose:
 
    ```sh
-   docker-compose up -d
+   docker compose up -d
    ```
 
 3. Acesse o projeto no seu navegador:
