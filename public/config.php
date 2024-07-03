@@ -4,9 +4,9 @@ require_once 'includes/functions.php';
 require_once 'includes/classes/User.php';
 
 $hostname = "mysql";
-$username = "php";
+$username = "root";
 $password = "password";
-$database = "DB";
+$database = "loja";
 
 // Criar a conexão com o MySQL usando MySQLi
 $conn = new mysqli($hostname, $username, $password, $database);
