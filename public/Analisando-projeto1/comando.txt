@@ -1,0 +1,2 @@
+executar o comando na pasta em que se encontra a pasta public:
+php -S localhost:8001 -t public
