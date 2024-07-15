@@ -14,7 +14,7 @@ services:
       - "./.mysql-data/db:/var/lib/mysql"
     environment:
       - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_DATABASE=loja
+      - MYSQL_DATABASE=DB
     ports:
       - "3306:3306"
     networks:
