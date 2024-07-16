@@ -9,11 +9,11 @@ $password = "password";
 $database = "DB";
 
 // Criar a conexão com o MySQL usando MySQLi
-// $conn = new mysqli($hostname, $username, $password, $database);
+$conn = new mysqli($hostname, $username, $password, $database);
 
-// // Verificar a conexão
-// if ($conn->connect_error) {
-//     die("Conexão falhou: " . $conn->connect_error);
-// }
+// Verificar a conexão
+if ($conn->connect_error) {
+    die("Conexão falhou: " . $conn->connect_error);
+}
 
 echo "\nConectado ao banco de dados com sucesso!\n" . PHP_EOL;
