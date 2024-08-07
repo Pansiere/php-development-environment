@@ -1,0 +1,10 @@
+{
+  "autoload": {
+    "psr-4": {
+      "Dev\\": "includes/"
+    }
+  },
+  "require": {
+    "ext-pdo": "*"
+  }
+}
