@@ -1,16 +1,19 @@
 {
-    "name": "pansiere/env",
-    "type": "library",
-    "autoload": {
-        "psr-4": {
-            "Pansiere\\Env\\": "src/"
-        }
+  "name": "pansiere/env",
+  "type": "library",
+  "autoload": {
+    "psr-4": {
+      "Pansiere\\Env\\": "src/"
     },
-    "authors": [
-        {
-            "name": "João Pedro V. Pansiere",
-            "email": "ojp027@gmail.com"
-        }
-    ],
-    "require": {}
+    "files": [
+      "src/helper.php"
+    ]
+  },
+  "authors": [
+    {
+      "name": "João Pedro V. Pansiere",
+      "email": "ojp027@gmail.com"
+    }
+  ],
+  "require": {}
 }
