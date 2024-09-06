@@ -2,7 +2,8 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
+use Pansiere\Env\Controller\Controller;
 
-$a = 123;
+$page = rtrim(strtok($_SERVER['REQUEST_URI'], '?'), '/') ?: '/';
 
-dd($a);
+dd($uri, $pageOld, $page);
