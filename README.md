@@ -21,11 +21,9 @@ Este projeto utiliza os seguintes serviços:
 O arquivo `docker-compose.yml` utilizado no projeto é o seguinte:
 
 ```yaml
-###############################################################################
-#                          Generated on phpdocker.io                          #
-#                                    &                                        #
-#                    Modificado por João Pedro V. Pansiere                    #
-###############################################################################
+###################################################
+#      Made by João Pedro Vicente Pansiere        #
+###################################################
 version: "3.1"
 services:
   mysql:
@@ -38,8 +36,11 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_DATABASE=DB
-      - MYSQL_USER=php
-      - MYSQL_PASSWORD=password
+    ports:
+      - "3306:3306"
+    networks:
+      environment_network:
+        ipv4_address: 172.30.0.2
 
   webserver:
     image: "nginx:alpine"
@@ -50,6 +51,9 @@ services:
       - "./phpdocker.io/nginx/nginx.conf:/etc/nginx/conf.d/default.conf"
     ports:
       - "80:80"
+    networks:
+      environment_network:
+        ipv4_address: 172.30.0.3
 
   php-fpm:
     build: phpdocker.io/php-fpm
@@ -58,6 +62,9 @@ services:
     volumes:
       - ".:/application"
       - "./phpdocker.io/php-fpm/php-ini-overrides.ini:/etc/php/8.3/fpm/conf.d/99-overrides.ini"
+    networks:
+      environment_network:
+        ipv4_address: 172.30.0.4
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
@@ -68,6 +75,16 @@ services:
       - PMA_PASSWORD=password
     ports:
       - "8080:80"
+    networks:
+      environment_network:
+        ipv4_address: 172.30.0.5
+
+networks:
+  environment_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/16
 ```
 
 ## Instruções de Uso
@@ -88,25 +105,6 @@ services:
 3. Acesse o projeto no seu navegador:
    - Aplicação PHP: `http://localhost`
    - PhpMyAdmin: `http://localhost:8080`
-
-## Estrutura de Diretórios
-
-A estrutura básica dos arquivos do projeto é a seguinte:
-
-```BASH
-/
-├── .mysql-data/
-├── phpdocker.io/
-│   ├── nginx/
-│   │   └── nginx.conf
-│   └── php-fpm/
-│       ├── Dockerfile
-│       └── php-ini-overrides.ini
-├── public/
-│   └── (seus arquivos PHP)
-├── docker-compose.yml
-└── README.md
-```
 
 ## Considerações
 
