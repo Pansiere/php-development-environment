@@ -1,7 +1,3 @@
-<?php include 'includes/header.php'; ?>
+<?php
 
-<div class="content">
-    <p>Este é o conteúdo principal da página.</p>
-</div>
-
-<?php include 'includes/footer.php'; ?>
+require __DIR__ . '/../'
