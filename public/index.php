@@ -3,6 +3,7 @@
 session_start();
 
 require __DIR__ . '/../vendor/autoload.php';
+echo $a;
 
 use Pansiere\Env\Controller\Controller;
 
