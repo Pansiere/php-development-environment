@@ -31,7 +31,6 @@ services:
     networks:
       environment_network:
         ipv4_address: 172.30.0.3
-    # command: sh -c "touch /var/log/nginx/application_php_errors.log && chmod 666 /var/log/nginx/application_php_errors.log && php-fpm"
 
   php-fpm:
     build: phpdocker.io/php-fpm
